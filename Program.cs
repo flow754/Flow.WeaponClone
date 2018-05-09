@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -603,6 +604,11 @@ namespace Flow.WeaponClone
             }
         }
 
+        private static string ReplaceCaseInsensitive(string input, string search, string replacement)
+        {
+            return Regex.Replace(input, Regex.Escape(search), replacement.Replace("$", "$$"), RegexOptions.IgnoreCase);
+        }
+
         static void costumeToWeaponProgram(Options options)
         {
 
@@ -641,6 +647,7 @@ namespace Flow.WeaponClone
                 newAsm_skins = AssetAssemblerFile.FromStream(newAsm_skins_Stream);
             }
 
+
             XDocument items_3d = null;
             XDocument items_inventory = null;
             XDocument store_weapons = null;
@@ -673,6 +680,7 @@ namespace Flow.WeaponClone
             var weapons_Table = weapons.Descendants("Table").First();
             var store_weapons_WeaponsList = store_weapons.Descendants("Table").Descendants("Store_Weapons").Descendants("Weapons_List").First();
 
+            //So far we have empty objects for all necessary xtbl files, ready to be filled with actual data
             //This is where shit gets serious
             XElement costumeNode = FindWeaponCostume(options.Source, sriv);
             string costumeEntry = "";
@@ -837,7 +845,7 @@ namespace Flow.WeaponClone
                     string smeshFilename = smeshFilenameNode.Value;
                     oldMeshName = Path.GetFileNameWithoutExtension(smeshFilename);
 
-                    newUniversalName = (itemNodeCount == 0) ? options.NewName : oldMeshName.Replace(baseMeshName, options.NewName);
+                    newUniversalName = (itemNodeCount == 0) ? options.NewName : ReplaceCaseInsensitive(oldMeshName, baseMeshName, options.NewName);
                     smeshFilenameNode.Value = newUniversalName + ".smeshx";
 
                     Console.WriteLine("Mapping mesh {0} -> {1}", smeshFilename, smeshFilenameNode.Value);
@@ -851,7 +859,7 @@ namespace Flow.WeaponClone
                     string cmeshFilename = cmeshFilenameNode.Value;
                     oldMeshName = Path.GetFileNameWithoutExtension(cmeshFilename);
 
-                    newUniversalName = (itemNodeCount == 0) ? options.NewName : oldMeshName.Replace(baseMeshName, options.NewName);
+                    newUniversalName = (itemNodeCount == 0) ? options.NewName : ReplaceCaseInsensitive(oldMeshName, baseMeshName, options.NewName);
                     cmeshFilenameNode.Value = newUniversalName + ".cmeshx";
 
                     var rigNode = meshInformationNode.Element("rig");
@@ -1393,7 +1401,7 @@ namespace Flow.WeaponClone
                     string smeshFilename = smeshFilenameNode.Value;
                     oldMeshName = Path.GetFileNameWithoutExtension(smeshFilename);
 
-                    newUniversalName = (itemNodeCount == 0) ? options.NewName : oldMeshName.Replace(baseMeshName, options.NewName);
+                    newUniversalName = (itemNodeCount == 0) ? options.NewName : ReplaceCaseInsensitive(oldMeshName, baseMeshName, options.NewName);
                     smeshFilenameNode.Value = newUniversalName + ".smeshx";
 
                     Console.WriteLine("Mapping mesh {0} -> {1}", smeshFilename, smeshFilenameNode.Value);
@@ -1407,7 +1415,7 @@ namespace Flow.WeaponClone
                     string cmeshFilename = cmeshFilenameNode.Value;
                     oldMeshName = Path.GetFileNameWithoutExtension(cmeshFilename);
 
-                    newUniversalName = (itemNodeCount == 0) ? options.NewName : oldMeshName.Replace(baseMeshName, options.NewName);
+                    newUniversalName = (itemNodeCount == 0) ? options.NewName : ReplaceCaseInsensitive(oldMeshName, baseMeshName, options.NewName);
                     cmeshFilenameNode.Value = newUniversalName + ".cmeshx";
 
                     var rigNode = meshInformationNode.Element("rig");
